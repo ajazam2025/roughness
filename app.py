@@ -8,7 +8,7 @@ from sklearn.linear_model import LinearRegression, BayesianRidge
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.ensemble import AdaBoostRegressor
 
-# -------------------------------
+# ------------------------------
 # PAGE CONFIG
 # -------------------------------
 st.set_page_config(page_title="Roughness Predictor", layout="centered")
