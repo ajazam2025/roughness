@@ -14,38 +14,71 @@ from sklearn.ensemble import AdaBoostRegressor
 st.set_page_config(page_title="Roughness Predictor", layout="centered")
 
 # -------------------------------
-# CUSTOM STYLE
+# CUSTOM CSS (FULL STYLING)
 # -------------------------------
 st.markdown("""
 <style>
-.main {
-    background-color: #f5f7fa;
+
+/* Background */
+body {
+    background-color: #f4f7fb;
 }
-h1 {
-    color: #2c3e50;
+
+/* Top Banner */
+.banner {
+    background: linear-gradient(90deg, #1f77b4, #2ca02c);
+    padding: 15px;
+    border-radius: 10px;
     text-align: center;
-}
-h3 {
-    color: #34495e;
-}
-.stButton>button {
-    background-color: #2c7be5;
     color: white;
-    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Section Box */
+.box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+/* Button */
+.stButton>button {
+    background: linear-gradient(90deg, #ff7f0e, #d62728);
+    color: white;
+    border-radius: 10px;
     height: 3em;
     width: 100%;
     font-size: 16px;
+    font-weight: bold;
 }
+
+/* Footer */
+.footer {
+    background: linear-gradient(90deg, #2c3e50, #34495e);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    color: white;
+    font-size: 14px;
+    margin-top: 30px;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
 # -------------------------------
-# HEADER
+# TOP BANNER
 # -------------------------------
-st.title("🌊 AI-Based Roughness Predictor")
-st.markdown("### Developed by **Ajaz Mir**")
+st.markdown('<div class="banner">Developed for AI Applications in Geomorphology</div>', unsafe_allow_html=True)
 
-st.markdown("---")
+# -------------------------------
+# TITLE
+# -------------------------------
+st.markdown("<h1 style='text-align:center; color:#2c3e50;'>🌊 Hydraulic Roughness Predictor</h1>", unsafe_allow_html=True)
 
 # -------------------------------
 # DATA (EMBEDDED)
@@ -68,14 +101,18 @@ scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
 # -------------------------------
-# MODEL SELECTION
+# MODEL SELECTION BOX
 # -------------------------------
-st.markdown("### 🔧 Select Model")
+st.markdown('<div class="box">', unsafe_allow_html=True)
+
+st.subheader("🔧 Select Machine Learning Model")
 
 model_name = st.selectbox(
-    "Choose Machine Learning Model",
-    ["AdaBoost (Best)", "Linear Regression", "Bayesian Ridge", "KNN"]
+    "",
+    ["AdaBoost (Recommended)", "Linear Regression", "Bayesian Ridge", "KNN"]
 )
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Initialize model
 if model_name == "Linear Regression":
@@ -90,13 +127,14 @@ elif model_name == "KNN":
 else:
     model = AdaBoostRegressor(n_estimators=100, random_state=42)
 
-# Train model
 model.fit(X_scaled, y)
 
 # -------------------------------
-# INPUT SECTION
+# INPUT BOX
 # -------------------------------
-st.markdown("### 📥 Input Parameters")
+st.markdown('<div class="box">', unsafe_allow_html=True)
+
+st.subheader("📥 Input Parameters")
 
 col1, col2 = st.columns(2)
 
@@ -110,10 +148,12 @@ with col2:
     Slope = st.number_input("Slope", value=0.0005)
     u_star = st.number_input("Shear Velocity (u*)", value=0.3)
 
+st.markdown('</div>', unsafe_allow_html=True)
+
 # -------------------------------
-# PREDICTION
+# PREDICTION BOX
 # -------------------------------
-st.markdown("---")
+st.markdown('<div class="box">', unsafe_allow_html=True)
 
 if st.button("🚀 Predict Roughness"):
     input_data = np.array([[Fr, Re, HD, LD, Slope, u_star]])
@@ -123,11 +163,15 @@ if st.button("🚀 Predict Roughness"):
 
     st.success(f"🎯 Predicted Manning's n = {pred[0]:.6f}")
 
+st.markdown('</div>', unsafe_allow_html=True)
+
 # -------------------------------
-# FOOTER
+# FOOTER (YOUR NAME HERE)
 # -------------------------------
-st.markdown("---")
-st.markdown(
-    "<center><small>Developed for AI Applications in Geomorphology</small></center>",
-    unsafe_allow_html=True
-)
+st.markdown("""
+<div class="footer">
+Developed by <b>Ajaz Mir</b><br>
+Research Scholar<br>
+Dr. B R Ambedkar National Institute of Technology, Jalandhar
+</div>
+""", unsafe_allow_html=True)
