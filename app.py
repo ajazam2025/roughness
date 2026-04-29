@@ -4,22 +4,26 @@ import pandas as pd
 from io import StringIO
 
 from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LinearRegression, BayesianRidge
-from sklearn.neighbors import KNeighborsRegressor
 from sklearn.ensemble import AdaBoostRegressor
 
 # -------------------------------
-# PAGE CONFIG (COMPACT)
+# PAGE CONFIG (CENTERED MOBILE)
 # -------------------------------
-st.set_page_config(layout="wide")
+st.set_page_config(layout="centered")
 
 # -------------------------------
-# CSS (NO SCROLL + COMPACT)
+# CSS (MOBILE STYLE)
 # -------------------------------
 st.markdown("""
 <style>
 
-/* Remove extra spacing */
+/* Limit width (mobile look) */
+.main {
+    max-width: 420px;
+    margin: auto;
+}
+
+/* Remove padding */
 .block-container {
     padding-top: 1rem;
     padding-bottom: 0rem;
@@ -28,37 +32,25 @@ st.markdown("""
 /* Banner */
 .banner {
     background: linear-gradient(90deg,#1f77b4,#2ca02c);
-    padding: 15px;
+    padding: 12px;
     border-radius: 10px;
     text-align: center;
     color: white;
-    margin-bottom: 10px;
-}
-.banner h1 {
-    font-size: 26px;
-    margin: 0;
-}
-.banner p {
     font-size: 14px;
-    margin: 0;
 }
 
-/* Cards */
+/* Card */
 .card {
     background: white;
     padding: 12px;
     border-radius: 10px;
-    box-shadow: 0px 3px 8px rgba(0,0,0,0.08);
+    box-shadow: 0px 3px 8px rgba(0,0,0,0.1);
+    margin-top: 10px;
 }
-
-/* Headers */
-.blue {background:#2c7be5;color:white;padding:6px;border-radius:6px;font-size:14px;}
-.green {background:#28a745;color:white;padding:6px;border-radius:6px;font-size:14px;}
-.purple {background:#6f42c1;color:white;padding:6px;border-radius:6px;font-size:14px;}
 
 /* Result */
 .result {
-    font-size: 30px;
+    font-size: 26px;
     text-align:center;
     font-weight:bold;
     color:#28a745;
@@ -66,36 +58,39 @@ st.markdown("""
 
 /* Button */
 .stButton>button {
+    width: 100%;
     height: 2.5em;
-    font-size: 14px;
+    border-radius: 8px;
+    background: linear-gradient(90deg,#ff7f0e,#d62728);
+    color: white;
 }
 
 /* Footer */
 .footer {
     background:#2c3e50;
     color:white;
-    padding:8px;
+    padding:10px;
     text-align:center;
     border-radius:8px;
     font-size:12px;
-    margin-top:5px;
+    margin-top:10px;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
 # -------------------------------
-# TOP BANNER
+# BANNER
 # -------------------------------
 st.markdown("""
 <div class="banner">
-<h1>AI-Based Hydraulic Roughness Predictor</h1>
-<p>Developed for AI Applications in Geomorphology</p>
+<b>AI-Based Hydraulic Roughness Predictor</b><br>
+Developed for AI Applications in Geomorphology
 </div>
 """, unsafe_allow_html=True)
 
 # -------------------------------
-# DATA (HIDDEN FROM UI)
+# DATA (HIDDEN)
 # -------------------------------
 DATA_CSV = """Fr,Re,H_D,LD,Slope_S,u_star,Manning_n
 0.5015,543478,1.67,2,0.0005,0.3395,0.00368
@@ -110,82 +105,42 @@ y = df["Manning_n"]
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
-# -------------------------------
-# LAYOUT (COMPACT GRID)
-# -------------------------------
-col1, col2, col3 = st.columns([1,1,1])
+model = AdaBoostRegressor()
+model.fit(X_scaled, y)
 
 # -------------------------------
-# INPUT PANEL
-# -------------------------------
-with col1:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown('<div class="blue">INPUT PARAMETERS</div>', unsafe_allow_html=True)
-
-    Fr = st.number_input("Fr", value=0.5)
-    Re = st.number_input("Re", value=500000.0)
-    HD = st.number_input("H/D", value=1.6)
-    LD = st.number_input("λ/D", value=2.5)
-    Slope = st.number_input("Slope", value=0.0005)
-    u_star = st.number_input("u*", value=0.3)
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# -------------------------------
-# MODEL PANEL
-# -------------------------------
-with col2:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown('<div class="purple">MODEL</div>', unsafe_allow_html=True)
-
-    model_name = st.selectbox("", [
-        "AdaBoost",
-        "Bayesian",
-        "KNN",
-        "Linear"
-    ])
-
-    if model_name == "Linear":
-        model = LinearRegression()
-    elif model_name == "Bayesian":
-        model = BayesianRidge()
-    elif model_name == "KNN":
-        model = KNeighborsRegressor(n_neighbors=3)
-    else:
-        model = AdaBoostRegressor()
-
-    model.fit(X_scaled, y)
-
-    predict_btn = st.button("🚀 Predict")
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# -------------------------------
-# RESULT PANEL
-# -------------------------------
-with col3:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown('<div class="green">RESULT</div>', unsafe_allow_html=True)
-
-    if predict_btn:
-        input_data = np.array([[Fr, Re, HD, LD, Slope, u_star]])
-        pred = model.predict(scaler.transform(input_data))
-
-        st.markdown(f'<div class="result">{pred[0]:.6f}</div>', unsafe_allow_html=True)
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# -------------------------------
-# MODEL COMPARISON (INLINE)
+# INPUT CARD
 # -------------------------------
 st.markdown('<div class="card">', unsafe_allow_html=True)
 
-c1, c2, c3, c4 = st.columns(4)
-c1.metric("AdaBoost", "0.987")
-c2.metric("Bayesian", "0.968")
-c3.metric("KNN", "0.942")
-c4.metric("Linear", "0.915")
+Fr = st.number_input("Fr", value=0.5)
+Re = st.number_input("Re", value=500000.0)
+HD = st.number_input("H/D", value=1.6)
+LD = st.number_input("λ/D", value=2.5)
+Slope = st.number_input("Slope", value=0.0005)
+u_star = st.number_input("u*", value=0.3)
 
+st.markdown('</div>', unsafe_allow_html=True)
+
+# -------------------------------
+# PREDICT BUTTON
+# -------------------------------
+predict = st.button("🚀 Predict Roughness")
+
+# -------------------------------
+# RESULT
+# -------------------------------
+if predict:
+    input_data = np.array([[Fr, Re, HD, LD, Slope, u_star]])
+    pred = model.predict(scaler.transform(input_data))
+
+    st.markdown(f'<div class="card result">{pred[0]:.6f}</div>', unsafe_allow_html=True)
+
+# -------------------------------
+# MODEL SCORE
+# -------------------------------
+st.markdown('<div class="card">', unsafe_allow_html=True)
+st.metric("Model (AdaBoost R²)", "0.987")
 st.markdown('</div>', unsafe_allow_html=True)
 
 # -------------------------------
@@ -193,7 +148,8 @@ st.markdown('</div>', unsafe_allow_html=True)
 # -------------------------------
 st.markdown("""
 <div class="footer">
-Developed by <b>Ajaz Mir</b> | Research Scholar<br>
+Developed by <b>Ajaz Mir</b><br>
+Research Scholar<br>
 Dr B R Ambedkar National Institute of Technology Jalandhar
 </div>
 """, unsafe_allow_html=True)
