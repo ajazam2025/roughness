@@ -42,8 +42,8 @@ h3 {
 # -------------------------------
 # HEADER
 # -------------------------------
-st.title("🌊 AI-Based Hydraulic Roughness Predictor")
-st.markdown("### Developed by **Ajax Mir**")
+st.title("🌊 AI-Based Roughness Predictor")
+st.markdown("### Developed by **Ajaz Mir**")
 
 st.markdown("---")
 
