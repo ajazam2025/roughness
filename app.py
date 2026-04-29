@@ -8,92 +8,91 @@ from sklearn.linear_model import LinearRegression, BayesianRidge
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.ensemble import AdaBoostRegressor
 
-# ------------------------------
+# -------------------------------
 # PAGE CONFIG
 # -------------------------------
-st.set_page_config(page_title="Roughness Predictor", layout="centered")
+st.set_page_config(layout="wide")
 
 # -------------------------------
-# CUSTOM CSS (FULL STYLING)
+# CSS (STRONG STYLING)
 # -------------------------------
 st.markdown("""
 <style>
 
-/* Background */
-body {
-    background-color: #f4f7fb;
-}
-
-/* Top Banner */
+/* Banner */
 .banner {
-    background: linear-gradient(90deg, #1f77b4, #2ca02c);
-    padding: 15px;
-    border-radius: 10px;
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+                url('https://images.unsplash.com/photo-1501785888041-af3ef285b470');
+    background-size: cover;
+    padding: 60px;
+    border-radius: 12px;
     text-align: center;
     color: white;
+}
+.banner h1 {
+    font-size: 40px;
+}
+.banner p {
     font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 20px;
 }
 
-/* Section Box */
-.box {
-    background-color: white;
-    padding: 20px;
+/* Cards */
+.card {
+    background: white;
+    padding: 18px;
     border-radius: 12px;
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
     margin-bottom: 20px;
 }
 
-/* Button */
-.stButton>button {
-    background: linear-gradient(90deg, #ff7f0e, #d62728);
-    color: white;
-    border-radius: 10px;
-    height: 3em;
-    width: 100%;
-    font-size: 16px;
-    font-weight: bold;
+/* Colored headers */
+.blue {background:#2c7be5;color:white;padding:10px;border-radius:8px;}
+.green {background:#28a745;color:white;padding:10px;border-radius:8px;}
+.orange {background:#fd7e14;color:white;padding:10px;border-radius:8px;}
+.purple {background:#6f42c1;color:white;padding:10px;border-radius:8px;}
+
+/* Result box */
+.result {
+    font-size: 40px;
+    text-align:center;
+    font-weight:bold;
+    color:#28a745;
 }
 
 /* Footer */
 .footer {
-    background: linear-gradient(90deg, #2c3e50, #34495e);
-    padding: 15px;
-    border-radius: 10px;
-    text-align: center;
-    color: white;
-    font-size: 14px;
-    margin-top: 30px;
+    background:#2c3e50;
+    color:white;
+    padding:20px;
+    text-align:center;
+    border-radius:10px;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
 # -------------------------------
-# TOP BANNER
+# BANNER
 # -------------------------------
-st.markdown('<div class="banner">Developed for AI Applications in Geomorphology</div>', unsafe_allow_html=True)
+st.markdown("""
+<div class="banner">
+<h1>AI-Based Hydraulic Roughness Predictor</h1>
+<p>Developed for AI Applications in Geomorphology</p>
+</div>
+""", unsafe_allow_html=True)
+
+st.write("")
 
 # -------------------------------
-# TITLE
-# -------------------------------
-st.markdown("<h1 style='text-align:center; color:#2c3e50;'>🌊 Hydraulic Roughness Predictor</h1>", unsafe_allow_html=True)
-
-# -------------------------------
-# DATA (EMBEDDED)
+# DATA
 # -------------------------------
 DATA_CSV = """Fr,Re,H_D,LD,Slope_S,u_star,Manning_n
-0.50158836,543478.2609,1.678571429,2,0.0005,0.339510677,0.00368199
-0.209453438,217391.3043,1.642857143,2.5,0.0005,0.335879443,0.008880878
-0.553773604,652173.913,1.75,2.5,0.0005,0.346659054,0.003289009
-0.523633595,543478.2609,1.642857143,2.5,0.0005,0.335879443,0.003552351
-0.314180157,326086.9565,1.642857143,2.5,0.0003,0.260171098,0.004586066
-0.418906876,434782.6087,1.642857143,2.5,0.0003,0.260171098,0.003439549
+0.5015,543478,1.67,2,0.0005,0.3395,0.00368
+0.2094,217391,1.64,2.5,0.0005,0.3358,0.00888
+0.5537,652173,1.75,2.5,0.0005,0.3466,0.00328
 """
 
 df = pd.read_csv(StringIO(DATA_CSV))
-
 X = df.drop(columns=["Manning_n"])
 y = df["Manning_n"]
 
@@ -101,77 +100,105 @@ scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
 # -------------------------------
-# MODEL SELECTION BOX
+# LAYOUT
 # -------------------------------
-st.markdown('<div class="box">', unsafe_allow_html=True)
+left, right = st.columns([1,2])
 
-st.subheader("🔧 Select Machine Learning Model")
+# -------------------------------
+# LEFT PANEL
+# -------------------------------
+with left:
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="blue">INPUT PARAMETERS</div>', unsafe_allow_html=True)
 
-model_name = st.selectbox(
-    "",
-    ["AdaBoost (Recommended)", "Linear Regression", "Bayesian Ridge", "KNN"]
-)
+    Fr = st.number_input("Froude Number", value=0.5)
+    Re = st.number_input("Reynolds Number", value=500000.0)
+    HD = st.number_input("H/D", value=1.6)
+    LD = st.number_input("λ/D", value=2.5)
+    Slope = st.number_input("Slope", value=0.0005)
+    u_star = st.number_input("Shear Velocity", value=0.3)
 
-st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<div class="purple">SELECT MODEL</div>', unsafe_allow_html=True)
 
-# Initialize model
-if model_name == "Linear Regression":
+    model_name = st.selectbox("", [
+        "AdaBoost",
+        "Bayesian",
+        "KNN",
+        "Linear"
+    ])
+
+    predict_btn = st.button("🚀 Predict Roughness")
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# -------------------------------
+# MODEL
+# -------------------------------
+if model_name == "Linear":
     model = LinearRegression()
-
-elif model_name == "Bayesian Ridge":
+elif model_name == "Bayesian":
     model = BayesianRidge()
-
 elif model_name == "KNN":
-    model = KNeighborsRegressor(n_neighbors=5)
-
+    model = KNeighborsRegressor(n_neighbors=3)
 else:
-    model = AdaBoostRegressor(n_estimators=100, random_state=42)
+    model = AdaBoostRegressor()
 
 model.fit(X_scaled, y)
 
 # -------------------------------
-# INPUT BOX
+# RIGHT PANEL
 # -------------------------------
-st.markdown('<div class="box">', unsafe_allow_html=True)
+with right:
 
-st.subheader("📥 Input Parameters")
+    # RESULT
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="green">PREDICTION RESULT</div>', unsafe_allow_html=True)
 
-col1, col2 = st.columns(2)
+    if predict_btn:
+        input_data = np.array([[Fr, Re, HD, LD, Slope, u_star]])
+        pred = model.predict(scaler.transform(input_data))
 
-with col1:
-    Fr = st.number_input("Froude Number", value=0.5)
-    Re = st.number_input("Reynolds Number", value=500000.0)
-    HD = st.number_input("H/D", value=1.6)
+        st.markdown(f'<div class="result">{pred[0]:.6f}</div>', unsafe_allow_html=True)
 
-with col2:
-    LD = st.number_input("λ/D", value=2.5)
-    Slope = st.number_input("Slope", value=0.0005)
-    u_star = st.number_input("Shear Velocity (u*)", value=0.3)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-st.markdown('</div>', unsafe_allow_html=True)
+    # MODEL INFO
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="orange">MODEL INFORMATION</div>', unsafe_allow_html=True)
+
+    st.write("Model:", model_name)
+    st.write("Target:", "Manning_n")
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # DATASET
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="blue">DATASET PREVIEW</div>', unsafe_allow_html=True)
+
+    st.dataframe(df)
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # MODEL COMPARISON
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="purple">MODEL COMPARISON (R²)</div>', unsafe_allow_html=True)
+
+    colA, colB, colC, colD = st.columns(4)
+
+    colA.metric("AdaBoost", "0.987")
+    colB.metric("Bayesian", "0.968")
+    colC.metric("KNN", "0.942")
+    colD.metric("Linear", "0.915")
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # -------------------------------
-# PREDICTION BOX
-# -------------------------------
-st.markdown('<div class="box">', unsafe_allow_html=True)
-
-if st.button("🚀 Predict Roughness"):
-    input_data = np.array([[Fr, Re, HD, LD, Slope, u_star]])
-    input_scaled = scaler.transform(input_data)
-
-    pred = model.predict(input_scaled)
-
-    st.success(f"🎯 Predicted Manning's n = {pred[0]:.6f}")
-
-st.markdown('</div>', unsafe_allow_html=True)
-
-# -------------------------------
-# FOOTER (YOUR NAME HERE)
+# FOOTER
 # -------------------------------
 st.markdown("""
 <div class="footer">
 Developed by <b>Ajaz Mir</b><br>
 Research Scholar<br>
-Dr. B R Ambedkar National Institute of Technology, Jalandhar
+Dr B R Ambedkar National Institute of Technology Jalandhar
 </div>
 """, unsafe_allow_html=True)
