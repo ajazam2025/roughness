@@ -14,7 +14,7 @@ st.set_page_config(
 )
 
 # =================================================
-# Custom CSS (same clean academic style)
+# Custom CSS
 # =================================================
 st.markdown(
     """
@@ -52,7 +52,7 @@ st.markdown(
 )
 
 # =================================================
-# Title and description
+# Title
 # =================================================
 st.title("🌊 GUI based Roughness Prediction Tool in Steep Channels")
 
@@ -62,7 +62,7 @@ st.markdown("""
 """)
 
 # =================================================
-# DATA (embedded)
+# DATA
 # =================================================
 DATA_CSV = """Fr,Re,H_D,LD,Slope_S,u_star,Manning_n
 0.5,500000,1.6,2.5,0.0005,0.3,0.0035
@@ -80,7 +80,7 @@ model = AdaBoostRegressor()
 model.fit(X_scaled, y)
 
 # =================================================
-# Input parameters (2-column layout EXACTLY like your file)
+# Input parameters
 # =================================================
 st.header("🔹 Input Parameters")
 
@@ -97,28 +97,7 @@ with col2:
     u_star = st.number_input("🌪 Shear Velocity, u*", min_value=0.01, value=0.3)
 
 # =================================================
-# Derived parameters (CARD STYLE SAME AS YOUR GUI)
-# =================================================
-ratio = u_star / Fr
-
-st.markdown(
-    f"""
-    <div style="
-        background-color:#ffffff;
-        padding:15px;
-        border-radius:12px;
-        box-shadow:0px 4px 10px rgba(0,0,0,0.1);
-        margin-top:10px;
-    ">
-    <h4 style="color:#0d47a1;">🔸 Derived Parameter</h4>
-    <p><b>u* / Fr</b> = {ratio:.3f}</p>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-# =================================================
-# Governing equations (optional)
+# Governing equations
 # =================================================
 with st.expander("📐 Governing Equations"):
     st.latex(r"Fr = \frac{U}{\sqrt{gH}}")
@@ -126,7 +105,7 @@ with st.expander("📐 Governing Equations"):
     st.latex(r"n = \frac{R^{2/3} S^{1/2}}{U}")
 
 # =================================================
-# Prediction section
+# Prediction
 # =================================================
 st.markdown("---")
 
@@ -156,7 +135,7 @@ if st.button("🚀 Predict Manning’s Roughness (n)"):
     )
 
 # =================================================
-# Footer (same academic style)
+# Footer
 # =================================================
 st.markdown("---")
 
