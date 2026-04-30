@@ -54,7 +54,7 @@ st.markdown(
 # =================================================
 # Title and description
 # =================================================
-st.title("🌊 Hydraulic Roughness Prediction Tool")
+st.title("🌊 GUI based Roughness Prediction Tool in Steep Channels")
 
 st.markdown("""
 ### ML-based estimation of Manning’s roughness coefficient (n)  
